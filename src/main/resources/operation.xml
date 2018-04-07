@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<operations>
+    <operationgroup>
+        <id>neteco.id</id>
+        <name>neteco.name</name>
+        <description>neteco.description</description>
+    </operationgroup>
+
+    <operation>
+        <id>query.id</id>
+        <name>query.name</name>
+        <description>query.description</description>
+        <groupid>neteco.id</groupid>
+    </operation>
+
+    <operation>
+        <id>insert.id</id>
+        <name>insert.name</name>
+        <description>insert.description</description>
+        <groupid>neteco.id</groupid>
+    </operation>
+</operations>

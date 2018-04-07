@@ -23,7 +23,7 @@ class A{
     }
 }
 
-class B extends A{
+class B extends A {
 	//注意：静态成员对象，和非静态成员对象的初始化顺序和实际
 	static C c =new C();
 	D d = new D();
