@@ -1,10 +1,15 @@
 package com.gzu.pyu.file.java.transfer;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import javax.xml.bind.annotation.XmlElement;
 
 public class OperationGroup {
+    @JSONField(name = "id",ordinal = 0)
     private String id;
+    @JSONField(name = "name",ordinal = 1)
     private String name;
+    @JSONField(name = "desc",ordinal = 2)
     private String description;
 
     public OperationGroup() {
