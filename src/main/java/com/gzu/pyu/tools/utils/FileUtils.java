@@ -1,8 +1,12 @@
 package com.gzu.pyu.tools.utils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import com.alibaba.fastjson.JSON;
+import com.huawei.hwclouds.dcs.api.filetransfer.Operation;
+import com.huawei.hwclouds.dcs.api.filetransfer.OperationGroup;
+import com.huawei.hwclouds.dcs.api.filetransfer.Operations;
+
+import javax.xml.bind.JAXBException;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
@@ -239,19 +243,62 @@ public class FileUtils
     }
 
     /**
+     * 将字符串写入文件
+     * @param targetStr 字符串
+     * @param pathName 输出文件
+     * @return boolean 结果
+     */
+    public static boolean writeStrinToFile(String targetStr, String pathName)
+            throws IOException
+    {
+        if (pathName == null)
+        {
+            //文件路径不能为null
+            throw new IllegalArgumentException("param pathName can not be null");
+        }
+
+        File file = new File(pathName);
+        //判断文件是否存在
+        if (!file.exists())
+        {
+            //文件不存在，退出
+            file.createNewFile();
+        }
+
+        if (targetStr==null)
+        {
+            throw new IllegalArgumentException("param targetStr can not be null");
+        }
+
+        byte[] bytes = targetStr.getBytes(CODE_UTF_8);
+
+        return writeBytesToFile(bytes, file);
+    }
+
+    /**
      * 将字节数组写入文件
      * @param bytes 字节数组
      * @param pathName 输出文件
      * @return boolean 结果
      */
     public static boolean writeBytesToFile(byte[] bytes, String pathName)
+            throws IOException
     {
-        if (!isFilePath(pathName))
+        if (pathName == null)
         {
+            //文件路径不能为null
             return false;
         }
 
-        return writeBytesToFile(bytes, new File(pathName));
+        File file = new File(pathName);
+        //判断文件是否存在
+        if (!file.exists())
+        {
+            //文件不存在，退出
+            file.createNewFile();
+        }
+
+        return writeBytesToFile(bytes, file);
     }
 
     /**
@@ -289,20 +336,92 @@ public class FileUtils
         }
     }
 
-    public static void main(String args[])
+    /**
+     * 将目标字符串写入相应的路径下的文件
+     * @param targetStr　目标字符串
+     * @param pathName　目标文件
+     * @return
+     * @throws IOException
+     */
+    public static boolean writerToFile(final String targetStr,final String pathName)
             throws IOException
     {
 
-        long timeStrat = new Date().getTime();
+        if (pathName==null)
+        {
+            return false;
+        }
+
+        File file = new File(pathName);
+        if (!file.exists())
+        {
+            file.createNewFile();
+        }
+
+        //写入到xml文件中
+        BufferedWriter bfw = new BufferedWriter(new FileWriter(file));
+        bfw.write(targetStr);
+        bfw.close();
+
+        return true;
+    }
+
+    public static void main(String args[])
+            throws IOException, JAXBException
+    {
+
         List<String> fileTargetList =
                 FileUtils.findAppointTargetFile("D:\\", "operation.xml", true);
-        long timeEnd = new Date().getTime();
-        System.out.println("cost time:" + (timeEnd - timeStrat));
-        System.out.println(fileTargetList.size());
 
-        List<String> fileAllList = FileUtils.traversalAppointDir("D:\\");
-        System.out.println("cost time:" + (new Date().getTime() - timeEnd));
-        System.out.println(fileAllList.size());
+        Operations operationAll = new Operations();
+        fileTargetList.parallelStream().forEach(path ->
+        {
+            try
+            {
+                Operations operations = XmlBeanTransferUtils.xmlToBean(path, Operations.class);
+                operationAll.addGroup(operations.getOperationGroupList());
+                operationAll.addOperation(operations.getOperationList());
+            }
+            catch (JAXBException | IOException e)
+            {
+                e.printStackTrace();
+            }
+
+        });
+
+        String jsonStr = JsonBeanTransferUtils.formatJsonStr(JSON.toJSONString(operationAll));
+        FileUtils.writeBytesToFile(jsonStr.getBytes(),"D:\\privilege_operations.json");
+
+        Operations operations=new Operations();
+        Operation operation=new Operation();
+        OperationGroup operationGroup=new OperationGroup();
+
+        ArrayList<String> deps = new ArrayList<>();
+        deps.add("deps XXXXXXXX");
+        operation.setDeps(deps);
+        operation.setDescription("descriptiong XXXXXX");
+        operation.setGroupid("group id XXXXXX");
+        operation.setId("id xxxx");
+        operation.setName("name XXXXXXXXX");
+        List<Operation> operationList=new ArrayList<>();
+        operationList.add(operation);
+        operationList.add(operation);
+
+        operationGroup.setName("name YYYYYYYYYYYYYY");
+        operationGroup.setId("ID YYYYYYYYYYYYYY");
+        operationGroup.setDescription("description YYYYYYYYYYY");
+        List<OperationGroup> groups=new ArrayList<>();
+        groups.add(operationGroup);
+
+        operations.addOperation(operationList);
+        operations.addGroup(groups);
+
+        String beanToXml = XmlBeanTransferUtils.beanToXml(operations, Operations.class);
+
+        FileUtils.writerToFile(beanToXml,"D:\\operation1");
+
+        FileUtils.writeStrinToFile(beanToXml,"D:\\operation2");
 
     }
 }
+
