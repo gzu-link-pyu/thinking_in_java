@@ -1,18 +1,12 @@
 package com.gzu.pyu.tools.utils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.gzu.pyu.file.java.transfer.Operation;
-import com.gzu.pyu.file.java.transfer.OperationGroup;
-import com.gzu.pyu.file.java.transfer.Operations;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
 
 public class XmlBeanTransferUtils {
 
@@ -40,41 +34,11 @@ public class XmlBeanTransferUtils {
      * @throws JAXBException
      * @throws IOException
      */
-    public static Object xmlToBean(String xmlPath,Class<?> load) throws JAXBException, IOException{
+    public static <T>T xmlToBean(String xmlPath,Class<T> load) throws JAXBException, IOException{
         JAXBContext context = JAXBContext.newInstance(load);
         Unmarshaller unmarshaller = context.createUnmarshaller();
-        Object object = unmarshaller.unmarshal(new File(xmlPath));
+        T object = (T)unmarshaller.unmarshal(new File(xmlPath));
         return object;
     }
 
-    public static void main(String[] args) throws JAXBException, IOException {
-
-        List<String> localTargetFile = FileUtils.findLocalTargetFile("operation.xml", true);
-        String xmlPath =  "G:/testConfig.xml";
-        Object object = xmlToBean(localTargetFile.get(0),Operations.class);
-        Operations students = (Operations)object;
-//        System.out.println(students);
-
-        String jsonStr= JSON.toJSONString(students);
-        System.out.println(JSON.toJSONString(students));
-
-        String formatJsonStr = JsonBeanTransferUtils.formatJsonStr(JSON.toJSONString(students));
-
-
-        Operations operations = new Operations();
-        List<OperationGroup> operationGroupList=new ArrayList<>();
-        operationGroupList.add(new OperationGroup("neteco.id","neteco.name","neteco.description"));
-        operations.setOperationGroupList(operationGroupList);
-
-        List<Operation> operationList =new ArrayList<>();
-        operationList.add(new Operation("query.id","query.name","query.description","neteco.id"));
-        operationList.add(new Operation("insert.id","insert.name","insert.description","neteco.id"));
-        operations.setOperationList(operationList);
-        String str =XmlBeanTransferUtils.beanToXml(operations, Operations.class);
-
-        //写入到xml文件中
-        BufferedWriter bfw = new BufferedWriter(new FileWriter(new File(xmlPath)));
-        bfw.write(str);
-        bfw.close();
-    }
 }
