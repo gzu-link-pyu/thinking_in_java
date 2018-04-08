@@ -1,20 +1,30 @@
 package com.gzu.pyu.file.java.transfer;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.alibaba.fastjson.annotation.JSONType;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name = "operations")
 public class Operations {
-    @JSONField(name = "operationgroups")
-    private List<OperationGroup> operationGroupList;
-    @JSONField(name = "operations")
-    private List<Operation> operationList;
+    @JSONField(name = "groups",ordinal = 0)
+    private List<OperationGroup> operationGroupList=new ArrayList<>();
+    @JSONField(name = "operations",ordinal = 1)
+    private List<Operation> operationList=new ArrayList<>();
 
     public Operations() {
+    }
+
+    public void addOperation(List<Operation> operationList)
+    {
+        this.operationList.addAll(operationList);
+    }
+
+    public void addGroup(List<OperationGroup> operationGroupList)
+    {
+        this.operationGroupList.addAll(operationGroupList);
     }
 
     public Operations(List<OperationGroup> operationGroupList, List<Operation> operationList) {
