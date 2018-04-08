@@ -1,12 +1,49 @@
 package com.gzu.pyu.file.java.transfer;
 
-import javax.xml.bind.annotation.XmlElement;
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import java.util.ArrayList;
+import java.util.List;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Operation {
+    @JSONField(name = "id",ordinal = 0)
     private String id;
+    @JSONField(name = "name",ordinal = 1)
     private String name;
+    @JSONField(name = "desc",ordinal = 2)
     private String description;
+    @JSONField(name = "groups",ordinal = 3)
+    private List<String> groupids=new ArrayList<>();
+    @JSONField(name = "deps",ordinal = 4)
+    private List<String> deps;
+
     private String groupid;
+
+    @XmlElementWrapper(name = "dependents")
+    @XmlElement(name="dependent")
+    public List<String> getDeps()
+    {
+        return deps;
+    }
+
+    public void setDeps(List<String> deps)
+    {
+        this.deps = deps;
+    }
+
+    public List<String> getGroupids()
+    {
+        return groupids;
+    }
+
+    public void setGroupids(List<String> groupids)
+    {
+        this.groupids = groupids;
+    }
 
     public Operation() {
     }
@@ -47,7 +84,7 @@ public class Operation {
     }
 
     public void setGroupid(String groupid) {
-        this.groupid = groupid;
+        groupids.add(groupid);
     }
 
     @Override
