@@ -1,9 +1,7 @@
 package com.gzu.pyu.tools.utils;
 
 import com.alibaba.fastjson.JSON;
-import com.huawei.hwclouds.dcs.api.filetransfer.Operation;
-import com.huawei.hwclouds.dcs.api.filetransfer.OperationGroup;
-import com.huawei.hwclouds.dcs.api.filetransfer.Operations;
+import com.gzu.pyu.java.entity.Operations;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;
@@ -13,6 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FileUtils
 {
@@ -35,6 +35,11 @@ public class FileUtils
      * 文件编码utf-8
      */
     public static final String CODE_UTF_8 = "UTF-8";
+
+    /**
+     * 文件编码GBK
+     */
+    public static final String CODE_GBK = "GBK";
 
     public static final FileUtils INSTANCE = new FileUtils();
 
@@ -59,13 +64,12 @@ public class FileUtils
 
     /**
      * 遍历local文件夹下指定的目标文件
-     * @param targetFileName
-     * @param isMatchFind
+     * @param targetFilePattern
      * @return
      */
-    public static List<String> findLocalTargetFile(String targetFileName, boolean isMatchFind)
+    public static List<String> findLocalTargetFile(String targetFilePattern)
     {
-        return findAppointTargetFile(LOCAL_USER_DIR, targetFileName, isMatchFind);
+        return findAppointTargetFile(LOCAL_USER_DIR, targetFilePattern);
     }
 
     /**
@@ -82,13 +86,10 @@ public class FileUtils
 
     /**
      * 搜索指定路径findDirPath下的目标文件targetFileName
-     * isMatchFind=true：支持精确查找
-     * isMatchFind=false：支持模糊查找
-     * @param findDirPath 搜索的指定路径
      * @return 匹配到的绝对路径集合
      * @throws IllegalArgumentException
      */
-    public static List<String> findAppointTargetFile(String findDirPath, String targetFileName, boolean isMatchFind)
+    public static List<String> findAppointTargetFile(String findDirPath, String targetFilePattern)
             throws IllegalArgumentException
     {
         if (findDirPath == null)
@@ -101,7 +102,7 @@ public class FileUtils
         traversalDir(findDirPath, fileAllList);
 
         //返回匹配的文件路径
-        return matchTargetFile(fileAllList, targetFileName, isMatchFind);
+        return matchTargetFile(fileAllList, targetFilePattern);
     }
 
     /**
@@ -166,35 +167,24 @@ public class FileUtils
             return;
         }
     }
-
     /**
      *
      * @param fileAllList 遍历的file
-     * @param targetFileName 目标file
-     * @param isMatchFind 是否精确查找[true:精确；false:模糊]
+     * @param targetFilePattern 目标file
      * @return 匹配的目标
      */
-    private static List<String> matchTargetFile(List<String> fileAllList, String targetFileName, boolean isMatchFind)
+    private static List<String> matchTargetFile(List<String> fileAllList, String targetFilePattern)
     {
         List<String> fileTargetList = Collections.synchronizedList(new ArrayList<>());
         if (fileAllList != null && fileAllList.size() > 0)
         {
             fileAllList.parallelStream().forEach(path ->
             {
-
                 File tmpFile = new File(path);
                 String fileName = tmpFile.getName();
-
-                //模糊查找
-                if (!isMatchFind && fileName.contains(targetFileName))
+                if(matchTargetStr(fileName,targetFilePattern))
                 {
-                    fileTargetList.add(path);
-                }
-
-                //精确查找
-                if (isMatchFind && fileName.equals(targetFileName))
-                {
-                    fileTargetList.add(path);
+                    fileTargetList.add(fileName);
                 }
             });
         }
@@ -202,6 +192,22 @@ public class FileUtils
     }
 
     /**
+     * 根据正则匹配目标字符串
+     * @param targetStr 目标字符串
+     * @param matchPattern 匹配正则
+     * @return
+     */
+    public static Boolean matchTargetStr(String targetStr,String matchPattern){
+        if (targetStr==null||matchPattern==null)
+        {
+            return false;
+        }
+
+        Pattern pattern=Pattern.compile(matchPattern);
+        Matcher matcher=pattern.matcher(targetStr);
+        return matcher.find();
+    }
+        /**
      * 读取文件的内容
      * @param fileName 文件名
      * @return String
@@ -371,7 +377,7 @@ public class FileUtils
     {
 
         List<String> fileTargetList =
-                FileUtils.findAppointTargetFile("D:\\", "operation.xml", true);
+                FileUtils.findAppointTargetFile("F:\\project-github", "operation.xml");
 
         Operations operationAll = new Operations();
         fileTargetList.parallelStream().forEach(path ->
@@ -390,37 +396,41 @@ public class FileUtils
         });
 
         String jsonStr = JsonBeanTransferUtils.formatJsonStr(JSON.toJSONString(operationAll));
-        FileUtils.writeBytesToFile(jsonStr.getBytes(),"D:\\privilege_operations.json");
+        FileUtils.writeBytesToFile(jsonStr.getBytes(),"F:\\project-github\\privilege_operations.json");
 
-        Operations operations=new Operations();
-        Operation operation=new Operation();
-        OperationGroup operationGroup=new OperationGroup();
+        System.out.println(jsonStr);
+        Operations operations1 = JSON.parseObject(jsonStr, Operations.class);
+        System.out.println(operations1);
 
-        ArrayList<String> deps = new ArrayList<>();
-        deps.add("deps XXXXXXXX");
-        operation.setDeps(deps);
-        operation.setDescription("descriptiong XXXXXX");
-        operation.setGroupid("group id XXXXXX");
-        operation.setId("id xxxx");
-        operation.setName("name XXXXXXXXX");
-        List<Operation> operationList=new ArrayList<>();
-        operationList.add(operation);
-        operationList.add(operation);
-
-        operationGroup.setName("name YYYYYYYYYYYYYY");
-        operationGroup.setId("ID YYYYYYYYYYYYYY");
-        operationGroup.setDescription("description YYYYYYYYYYY");
-        List<OperationGroup> groups=new ArrayList<>();
-        groups.add(operationGroup);
-
-        operations.addOperation(operationList);
-        operations.addGroup(groups);
-
-        String beanToXml = XmlBeanTransferUtils.beanToXml(operations, Operations.class);
-
-        FileUtils.writerToFile(beanToXml,"D:\\operation1");
-
-        FileUtils.writeStrinToFile(beanToXml,"D:\\operation2");
+//        Operations operations=new Operations();
+//        Operation operation=new Operation();
+//        OperationGroup operationGroup=new OperationGroup();
+//
+//        ArrayList<String> deps = new ArrayList<>();
+//        deps.add("deps XXXXXXXX");
+//        operation.setDeps(deps);
+//        operation.setDescription("descriptiong XXXXXX");
+//        operation.setGroupid("group id XXXXXX");
+//        operation.setId("id xxxx");
+//        operation.setName("name XXXXXXXXX");
+//        List<Operation> operationList=new ArrayList<>();
+//        operationList.add(operation);
+//        operationList.add(operation);
+//
+//        operationGroup.setName("name YYYYYYYYYYYYYY");
+//        operationGroup.setId("ID YYYYYYYYYYYYYY");
+//        operationGroup.setDescription("description YYYYYYYYYYY");
+//        List<OperationGroup> groups=new ArrayList<>();
+//        groups.add(operationGroup);
+//
+//        operations.addOperation(operationList);
+//        operations.addGroup(groups);
+//
+//        String beanToXml = XmlBeanTransferUtils.beanToXml(operations, Operations.class);
+//
+//        FileUtils.writerToFile(beanToXml,"F:\\project-github\\operation.xml");
+//
+//        FileUtils.writeStrinToFile(beanToXml,"F:\\project-github\\operation2.xml");
 
     }
 }

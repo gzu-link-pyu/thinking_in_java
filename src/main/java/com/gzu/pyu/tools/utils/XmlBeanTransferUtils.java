@@ -11,6 +11,15 @@ import java.io.StringWriter;
 public class XmlBeanTransferUtils {
 
     /**
+     * 文件编码utf-8
+     */
+    public static final String CODE_UTF_8 = "UTF-8";
+
+    /**
+     * 文件编码GBK
+     */
+    public static final String CODE_GBK = "GBK";
+    /**
      * java对象转换为xml文件
      * @param clazz    java对象.Class
      * @return    xml文件的String
@@ -20,7 +29,7 @@ public class XmlBeanTransferUtils {
         JAXBContext context = JAXBContext.newInstance(clazz);
         Marshaller marshaller = context.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.setProperty(Marshaller.JAXB_ENCODING, "GBK");
+        marshaller.setProperty(Marshaller.JAXB_ENCODING, CODE_UTF_8);
         StringWriter writer = new StringWriter();
         marshaller.marshal(obj,writer);
         return writer.toString();

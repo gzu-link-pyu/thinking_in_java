@@ -1,4 +1,4 @@
-package com.gzu.pyu.file.java.transfer;
+package com.gzu.pyu.java.entity;
 
 import com.alibaba.fastjson.annotation.JSONField;
 

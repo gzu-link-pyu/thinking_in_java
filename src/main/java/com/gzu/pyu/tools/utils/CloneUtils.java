@@ -11,8 +11,13 @@ import java.io.Serializable;
  * 在内存中通过字节流的拷贝是比较容易的，把木对象写入到一个字节流中，再从字节流中读出来，
  * 这样可以创建一个新的对象，且新对象与木对象不存在引用共享的问题，实现的对象的深拷贝
  */
-public class CloneUtils {
-    @SuppressWarnings("unchecked")
+public class CloneUtils implements Serializable{
+
+    private static final long serialVersionUID = -3042686055658234285L;
+
+    private CloneUtils(){
+    }
+
     public static <T extends Serializable> T clone(T obj){
         T cloneObj = null;
             //写入字节流
@@ -34,5 +39,12 @@ public class CloneUtils {
             e.printStackTrace();
         }
         return cloneObj;
+    }
+
+    public static void main(String[] args) {
+        CloneUtils obj1 = new CloneUtils();
+        CloneUtils obj2=CloneUtils.clone(obj1);
+
+        System.out.println(obj1==obj2);
     }
 }

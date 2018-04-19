@@ -1,6 +1,5 @@
-package com.gzu.pyu.java.test;
+package com.gzu.pyu.tools.utils;
 
-import com.gzu.pyu.tools.utils.FileUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -22,7 +21,7 @@ public class MainTest {
 		//得到解析器
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
-		List<String> localTargetFile = FileUtils.findLocalTargetFile("operation.xml", true);
+		List<String> localTargetFile = FileUtils.findLocalTargetFile("operation.xml");
 		//通过解析器就可以得到代表整个内存中XML的Document对象
 		Document document = builder.parse(localTargetFile.get(0));
 		test2(document);

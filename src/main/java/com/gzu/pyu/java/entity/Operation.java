@@ -1,14 +1,12 @@
-package com.gzu.pyu.file.java.transfer;
+package com.gzu.pyu.java.entity;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.List;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Operation {
     @JSONField(name = "id",ordinal = 0)
     private String id;

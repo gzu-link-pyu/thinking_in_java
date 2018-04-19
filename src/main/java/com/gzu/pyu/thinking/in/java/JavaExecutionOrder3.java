@@ -1,15 +1,15 @@
-package com.gzu.pyu.java.test;
+package com.gzu.pyu.thinking.in.java;
 
 public class JavaExecutionOrder3 {
     
     public static void main(String args[]){
         System.out.println("Start Java Execution Order：");
-        B b = new B();
+        OrderB b = new OrderB();
     }
 }
 
-class A{
-    C c =new C();
+class OrderA{
+    OrderC c =new OrderC();
     {
     	System.out.println("TestA's Code block");
     }
@@ -18,15 +18,15 @@ class A{
         System.out.println("TestA's Static code block");
     }
     
-    public A(){
+    public OrderA(){
         System.out.println("TestA's Constructor");
     }
 }
 
-class B extends A {
+class OrderB extends OrderA {
 	//注意：静态成员对象，和非静态成员对象的初始化顺序和实际
-	static C c =new C();
-	D d = new D();
+	static OrderA c =new OrderA();
+    OrderD d = new OrderD();
 	
 	static {
 		System.out.println("TestB's Static code block");
@@ -36,12 +36,12 @@ class B extends A {
     	System.out.println("TestB's Code block");
     }
 	
-    public B(){
+    public OrderB(){
         System.out.println("TestB's Constructor");
     }
 }
 
-class C {
+class OrderC {
 	static {
         System.out.println("TestC's Static code block");
     }
@@ -50,12 +50,12 @@ class C {
     	System.out.println("TestC's Code block");
     }
 	
-    public C(){
+    public OrderC(){
         System.out.println("TestC's Constructor");
     }
 }
 
-class D{
+class OrderD{
 	static {
         System.out.println("TestD's Static code block");
     }
@@ -64,7 +64,7 @@ class D{
     	System.out.println("TestD's Code block");
     }
 	
-    public D(){
+    public OrderD(){
         System.out.println("TestD's Constructor");
     }
 }

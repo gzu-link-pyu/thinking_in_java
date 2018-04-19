@@ -1,4 +1,4 @@
-package com.gzu.pyu.java.test;
+package com.gzu.pyu.thinking.in.java;
 
 public class JavaExecutionOrder1 {
 	
